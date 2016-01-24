@@ -1,0 +1,5 @@
+name = "jQuery Forcontu"
+description = "Implementations example of jQuery"
+core = 7.x
+files[] = jquery_forcontu.module
+package = My modules

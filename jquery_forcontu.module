@@ -1,0 +1,50 @@
+<?php
+/**
+ * @file
+ * Módulo jQuery Forcontu
+ * En esta módulo vamos a probar jQuery en Drupal
+ */
+
+/**
+ * Implements hook_menu().
+ */
+function jquery_forcontu_menu() {
+  $items = array();
+  $items['jquery_forcontu/accordion'] = array(
+    'title' => 'Last nodes published',
+    'page callback' => 'jquery_forcontu_accordion',
+    'access callback' => TRUE,
+  );
+
+  return $items;
+}
+
+/**
+ * Implements jquery accordion
+ */
+function jquery_forcontu_accordion() {
+  //agregamos libreria jquery ui.accordion
+  drupal_add_library('system' , 'ui.accordion' );
+  //agregamos fichero javascript
+  drupal_add_js(drupal_get_path('module' , 'jquery_forcontu' ) .
+    '/js/jquery_forcontu_accordion.js' );
+  //consultamos 5 ultimos nodos publicados
+
+  $output = '<div id="accordion">';
+  $query = db_select('node', 'n');
+  $query->join('field_data_body', 'b', 'n.nid = b.entity_id');
+  $query->groupBy('n.nid');
+  $query->fields('n', array('nid', 'title', 'created'));
+  $query->fields('b', array('entity_id', 'body_summary'));
+  //$query->condition('n.nid','image_for_slider','=');
+  $query->orderBy('n.created', 'DESC');
+  $query->range(0,5);
+  $result = $query->execute();
+  while($record = $result->fetchAssoc()) {
+    //dpm($record, '$record');
+    $output .= '<h3><a href="#">' . $record['title'] . '</a></h3>';
+    $output .= '<div><p>' . $record['body_summary'] .'</p></div>';
+  } 
+  $output .= '</div>' ;
+  return $output;
+}
